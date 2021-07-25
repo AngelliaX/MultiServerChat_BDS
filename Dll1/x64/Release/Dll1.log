@@ -1,15 +1,13 @@
 ﻿C:\Program Files (x86)\Microsoft Visual Studio\2019\Professional\MSBuild\Microsoft\VC\v160\Microsoft.CppBuild.targets(499,5): warning MSB8004: Output Directory does not end with a trailing slash.  This build instance will add the slash as it is required to allow proper evaluation of the Output Directory.
   multiserverchat.cpp
 C:\Users\namxm\OneDrive\Máy tính\File\Dll1\Dll1\multiserverchat.cpp(1,10): warning C4067: unexpected tokens following preprocessor directive - expected a newline
-C:\Users\namxm\OneDrive\Máy tính\File\Dll1\Dll1\multiserverchat.cpp(57,10): warning C4067: unexpected tokens following preprocessor directive - expected a newline
-C:\Users\namxm\OneDrive\Máy tính\File\Dll1\Dll1\multiserverchat.cpp(58,10): warning C4067: unexpected tokens following preprocessor directive - expected a newline
-C:\Users\namxm\OneDrive\Máy tính\File\Dll1\Dll1\multiserverchat.cpp(80,10): warning C4129: '|': unrecognized character escape sequence
-C:\Users\namxm\OneDrive\Máy tính\File\Dll1\Dll1\multiserverchat.cpp(80,10): warning C4129: ' ': unrecognized character escape sequence
-C:\Users\namxm\OneDrive\Máy tính\File\Dll1\Dll1\multiserverchat.cpp(80,10): warning C4129: '_': unrecognized character escape sequence
+C:\Users\namxm\OneDrive\Máy tính\File\Dll1\Dll1\multiserverchat.cpp(71,10): warning C4129: '|': unrecognized character escape sequence
+C:\Users\namxm\OneDrive\Máy tính\File\Dll1\Dll1\multiserverchat.cpp(71,10): warning C4129: ' ': unrecognized character escape sequence
+C:\Users\namxm\OneDrive\Máy tính\File\Dll1\Dll1\multiserverchat.cpp(71,10): warning C4129: '_': unrecognized character escape sequence
      Creating library ..\..\bedrock-server\plugins\Dll1.lib and object ..\..\bedrock-server\plugins\Dll1.exp
   Generating code
-  51 of 394 functions (12.9%) were compiled, the rest were copied from previous compilation.
-    23 functions were new in current compilation
-    26 functions had inline decision re-evaluated but remain unchanged
+  1 of 361 functions ( 0.3%) were compiled, the rest were copied from previous compilation.
+    0 functions were new in current compilation
+    1 functions had inline decision re-evaluated but remain unchanged
   Finished generating code
   Dll1.vcxproj -> C:\Users\namxm\OneDrive\Máy tính\File\bedrock-server\plugins\Dll1.dll

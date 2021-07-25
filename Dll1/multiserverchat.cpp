@@ -23,13 +23,16 @@ void schTask() {
         if (!temp_state)
         {
             res = mysql_store_result(conn);
+            string color1 = "\xc2\xa7" + std::string("b");
+            string color2 = "\xc2\xa7" + std::string("r");
+            string color3 = "\xc2\xa7" + std::string("a");
             while (row = mysql_fetch_row(res))
             {
                 //printf("ID: %s, Server: %s, Name: %s, Text: %s\n", row[0], row[1], row[2], row[3]);
                 for (Player* pl : liteloader::getAllPlayers())
                 {
                     WPlayer player = WPlayer{ *pl };
-                    player.sendText("<"+std::string(row[1])+"> <" + std::string(row[2]) + "> "+ std::string(row[3]), TextType::RAW);
+                    player.sendText("<"+color1+std::string(row[1])+color2+"> <"+color3+ std::string(row[2]) +color2+"> "+ std::string(row[3]), TextType::RAW);
                 }
                 string text = "DELETE FROM sur WHERE id = " + std::string(row[0]);
                 temp_state = mysql_query(conn, text.c_str());
@@ -51,30 +54,18 @@ bool playerChatEvent(ChatEV e) {
     {
         puts("Can't insert into table");
     }
-    return true;
-}
-
-#include <api\types\helper.h>;
-#include <api\types\types.h>;
-#include <api\myPacket.h>
-void playerJoinEvent(JoinEV e) {
-
-    
-}
-
-#include <stl/varint.h>
-bool oncmd_wow(CommandOrigin const& ori, CommandOutput& outp, string const& str, optional<string>& str2) {
-    //WPlayer player =  *ori.getEntity()->getPlayerOwner();
-    WPlayer player = MakeWP(ori).val();
-   
-    player.sendText("this is a text",TextType::CHAT);
-    puts("finished sending a text");
-    return true;
+    for (Player* pl : liteloader::getAllPlayers())
+    {
+        WPlayer player = WPlayer{ *pl };
+        string color1 = "\xc2\xa7"+std::string("a");
+        string color2 = "\xc2\xa7" + std::string("r");
+        player.sendText("<"+ color1 + std::string(e.pl->getNameTag()) + color2 +"> " + std::string(e.msg), TextType::RAW);
+    }
+    return false;
 }
 
 void multiserverchat_entry(){
 	Event::addEventListener(playerChatEvent);
-    Event::addEventListener(playerJoinEvent);
     connectDB();
     schTask();
     puts("\n                  _ _   _               _           _   \n                 | | | (_)             | |         | |  \n  _ __ ___  _   _| | |_ _ _____   _____| |__   __ _| |_ \n | '_ ` _ \| | | | | __| / __\ \ / / __| '_ \ / _` | __|\n | | | | | | |_| | | |_| \__ \\ V / (__| | | | (_| | |_ \n |_| |_| |_|\__,_|_|\__|_|___/ \_/ \___|_| |_|\__,_|\__|");                                                      
