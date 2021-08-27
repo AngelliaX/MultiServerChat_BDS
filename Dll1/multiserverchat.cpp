@@ -4,11 +4,16 @@ MYSQL* conn;
 MYSQL_ROW row;
 MYSQL_RES* res;
 
-string servers[] = { "sur","sky","sky_vic" };
+
+std::vector<string> servers;
+string Address;
+string Username;
+string Password;
+string Database;
 void connectDB() {
     conn = mysql_init(0);
 
-    conn = mysql_real_connect(conn, "play.unikfamily.com", "motcaiten", "", "unikfamily_db", 3306, NULL, 0);
+    conn = mysql_real_connect(conn, Address.c_str(), Username.c_str(), Password.c_str(), Database.c_str(), 3306, NULL, 0);
     if (conn) {
         for (std::string svname : servers)
         {
@@ -66,11 +71,56 @@ bool playerChatEvent(ChatEV e) {
     }
     return false;
 }
+void loadCfg() {
+    std::filesystem::create_directory("plugins\\MultiServerChat");
+    std::string config_file = "plugins\\MultiServerChat\\Config.json";
+    std::ifstream fs;
+    fs.open(config_file, std::ios::in);
+    if (!fs)
+    {
+        Address = "play.unikfamily.com";
+        Username = "motcaiten";
+        Password = "";
+        Database = "unikfamily_db";
+        servers = { "sur","sky","sky_vic" };
 
+        std::cout << "[MultiServerChat] " << config_file << " not found, creating file(default value used)\n";
+        std::ofstream of(config_file);
+        if (of)
+        {
+            std::string text =std::string("{\n  \"Address\": \"") + Address + "\",\n  \"Username\": \""+Username+ "\",\n  \"Password\": \"" + Password + "\",\n  \"Database\": \""+ Database+ "\",\n  \"Servers\": [\"sur\",\"sky\",\"sky_vic\"]"+ "\n}";
+            of << text;
+        }
+        else
+        {
+            std::cout << "[MultiServerChat] " << "config file creation failed, please create \"config\" folder\n";
+        }
+    }
+    else
+    {
+        std::string json;
+        char buf[1024];
+        while (fs.getline(buf, 1024))
+        {
+            json.append(buf);
+        }
+        rapidjson::Document document;
+        document.Parse(json.c_str());
+        Address = document["Address"].GetString();
+        Username = document["Username"].GetString();
+        Password = document["Password"].GetString();
+        Database = document["Database"].GetString();
+        auto arraylist = document["Servers"].GetArray();
+        for (rapidjson::Value::ConstValueIterator itr = arraylist.Begin(); itr != arraylist.End(); ++itr) {
+            servers.push_back(itr->GetString());
+        }
+    }
+    std::cout << "\n[MultiServerChat] Loaded!\n";
+}
 void multiserverchat_entry() {
     Event::addEventListener(playerChatEvent);
+    loadCfg();
     connectDB();
-    //schTask();
     puts("\n                  _ _   _               _           _   \n                 | | | (_)             | |         | |  \n  _ __ ___  _   _| | |_ _ _____   _____| |__   __ _| |_ \n | '_ ` _ \| | | | | __| / __\ \ / / __| '_ \ / _` | __|\n | | | | | | |_| | | |_| \__ \\ V / (__| | | | (_| | |_ \n |_| |_| |_|\__,_|_|\__|_|___/ \_/ \___|_| |_|\__,_|\__|");
     puts("                               made by tungnguyen\n");
 }

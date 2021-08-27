@@ -13,7 +13,12 @@
 #include <mc/Player.h>
 #include <api/commands.h>
 #include <string> 
-#include<sstream>  
+#include<sstream>
+#include <rapidjson/document.h>
+#include <fstream>
+#include <filesystem>
+#include <JsonLoader.h>
+#include <vector>
 //tutorial: https://www.youtube.com/watch?v=yNniOHn9Xe0&ab_channel=TenorGames
 #include <mysql.h>
 #include <winsock.h>
