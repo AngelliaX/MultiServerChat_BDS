@@ -6,10 +6,13 @@ MYSQL_RES* res;
 
 
 std::vector<string> servers;
+string THook;
 string Address;
 string Username;
 string Password;
 string Database;
+string Prefix;
+string Name;
 void connectDB() {
     conn = mysql_init(0);
 
@@ -24,7 +27,8 @@ void connectDB() {
                 puts("Error on creating table");
             }
         }
-        int temp_state = mysql_query(conn, "CREATE TABLE IF NOT EXISTS sur_translate (id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,server TEXT,name TEXT,message TEXT)");
+        string txt = "CREATE TABLE IF NOT EXISTS " + THook + " (id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,server TEXT,name TEXT,message TEXT)";
+        int temp_state = mysql_query(conn,txt.c_str());
         if (temp_state)
         {
             puts("Error on creating table");
@@ -36,7 +40,8 @@ void connectDB() {
 
 THook(void, "?tick@Level@@UEAAXXZ", class Level* lv) {
     original(lv);//Don't remove this line
-    int temp_state = mysql_query(conn, "SELECT * FROM sur_translate");
+    string txt = "SELECT * FROM "+ THook;
+    int temp_state = mysql_query(conn,txt.c_str());
     if (!temp_state)
     {
         res = mysql_store_result(conn);
@@ -45,11 +50,23 @@ THook(void, "?tick@Level@@UEAAXXZ", class Level* lv) {
             //printf("ID: %s, Server: %s, Name: %s, Text: %s\n", row[0], row[1], row[2], row[3]);
             for (Player* pl : liteloader::getAllPlayers())
             {
-                WPlayer player = WPlayer{ *pl };
-                std::string txt = row[3];
+                WPlayer player = WPlayer{ *pl };            
+                //std::cout << row[1] << "..." << row[2] << "..." << row[3] << "\n";
+                string txt(Prefix),
+                    pos("{server}"),
+                    des(row[1]);
+                if (row[1] != Name) {
+                    for (size_t index = 0; (index = txt.find(pos, index)) != string::npos;) {
+                        txt.replace(index, pos.length(), des);
+                    }
+                    txt = txt + row[3];
+                }
+                else {
+                    txt = row[3];
+                }
                 player.sendText(txt, TextType::RAW);
             }
-            string text = "DELETE FROM sur_translate WHERE id = " + std::string(row[0]);
+            string text = "DELETE FROM "+THook+" WHERE id = " + std::string(row[0]);
             temp_state = mysql_query(conn, text.c_str());
             if (temp_state)
             {
@@ -62,7 +79,7 @@ THook(void, "?tick@Level@@UEAAXXZ", class Level* lv) {
 bool playerChatEvent(ChatEV e) {
     for (string svname : servers)
     {
-        string txt = "INSERT INTO " + svname + " (server,name,message) VALUES ('sur','" + e.pl->getNameTag() + "','" + e.msg + "')";
+        string txt = "INSERT INTO " + svname + " (server,name,message) VALUES ('"+Name+"','" + e.pl->getNameTag() + "','" + e.msg + "')";
         int state = mysql_query(conn, txt.c_str());
         if (state)
         {
@@ -77,18 +94,20 @@ void loadCfg() {
     std::ifstream fs;
     fs.open(config_file, std::ios::in);
     if (!fs)
-    {
+    {     
         Address = "play.unikfamily.com";
         Username = "motcaiten";
         Password = "";
         Database = "unikfamily_db";
+        THook = "sur_translate";
         servers = { "sur","sky","sky_vic" };
-
+        Prefix = "[§6{server}§r] ";
+        Name = "Sur";
         std::cout << "[MultiServerChat] " << config_file << " not found, creating file(default value used)\n";
         std::ofstream of(config_file);
         if (of)
         {
-            std::string text =std::string("{\n  \"Address\": \"") + Address + "\",\n  \"Username\": \""+Username+ "\",\n  \"Password\": \"" + Password + "\",\n  \"Database\": \""+ Database+ "\",\n  \"Servers\": [\"sur\",\"sky\",\"sky_vic\"]"+ "\n}";
+            std::string text =std::string("{\n  \"Address\": \"") + Address + "\",\n  \"Username\": \""+Username+ "\",\n  \"Password\": \"" + Password + "\",\n  \"Database\": \""+ Database+ "\",\n  \"THook\": \""+THook+"\",\n  \"Servers\": [\"sur\",\"sky\",\"sky_vic\"],"+"\n  \"Prefix\": \""+Prefix+"\",\n  \"Name\": \"" + Name + "\"\n}";
             of << text;
         }
         else
@@ -110,6 +129,9 @@ void loadCfg() {
         Username = document["Username"].GetString();
         Password = document["Password"].GetString();
         Database = document["Database"].GetString();
+        Prefix = document["Prefix"].GetString();
+        THook = document["THook"].GetString();
+        Name = document["Name"].GetString();
         auto arraylist = document["Servers"].GetArray();
         for (rapidjson::Value::ConstValueIterator itr = arraylist.Begin(); itr != arraylist.End(); ++itr) {
             servers.push_back(itr->GetString());
